@@ -1,0 +1,8 @@
+services:
+    app.helper_exchange_rate.cbr:
+        class: AppBundle\Helper\ExchangeRate\CbrDownloader
+        arguments: ['@service_container']
+
+    app.helper_exchange_rate.yahoo_finance:
+        class: AppBundle\Helper\ExchangeRate\YahooFinanceDownloader
+        arguments: ['@service_container']

@@ -1,0 +1,4 @@
+parameters:
+    url_cbr: 'http://www.cbr.ru/scripts/XML_daily.asp'
+    base_currency_yahoo: "RUB"
+    url_yahoo: 'https://query.yahooapis.com/v1/public/yql?q=select+*+from+yahoo.finance.xchange+where+pair="USDRUB"&format=json&env=store://datatables.org/alltableswithkeys'

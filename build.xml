@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="currency" default="build" basedir=".">
+    <property name="basedir" value="${project.basedir}"/>
+    <property name="passthru" value="true"/>
+
+    <!-- Default dev target -->
+    <target name="build" depends="cache-clear, assets" />
+
+    <!-- Install targets -->
+    <target name="install" depends="composer-install, composer, cache-clear, assets" />
+
+    <!-- install composer -->
+    <target name="composer-install">
+        <if>
+            <available file="composer.phar" type="file" />
+            <then>
+                <exec command="php composer.phar self-update" dir="${basedir}" passthru="${passthru}" />
+            </then>
+            <else>
+                <exec command="curl -sS https://getcomposer.org/installer | php " dir="${basedir}" passthru="${passthru}" />
+            </else>
+        </if>
+    </target>
+
+    <!--&lt;!&ndash; Создаёт нужные директории &ndash;&gt;-->
+    <!--<target name="make-dirs">-->
+        <!--<echo msg="Making directory ./web/books" />-->
+        <!--<mkdir dir="./web/books" />-->
+        <!--<echo msg="Making directory ./web/cache" />-->
+        <!--<mkdir dir="./web/cache" />-->
+    <!--</target>-->
+
+
+    <!-- dump optimized autoloader -->
+    <target name="composer-dump-autoload">
+        <exec command="composer.phar dump-autoload --optimize" dir="${basedir}" passthru="${passthru}" />
+    </target>
+
+    <target name="composer-update-vendors-from-lock">
+        <exec command="php composer.phar install --no-dev --optimize-autoloader" dir="${basedir}" passthru="${passthru}" />
+    </target>
+
+    <!-- run composer using simple 'exec' task -->
+    <target name="composer">
+        <exec command="php composer.phar update" dir="${basedir}" passthru="${passthru}" />
+    </target>
+
+    <!-- clear cache web -->
+    <target name="cache-clear">
+        <exec command="php app/console cache:clear --env=dev" dir="${basedir}" passthru="${passthru}" />
+        <exec command="php app/console cache:clear --env=prod" dir="${basedir}" passthru="${passthru}" />
+        <exec command="php app/console cache:clear --env=test" dir="${basedir}" passthru="${passthru}" />
+    </target>
+    <!-- install assets -->
+    <target name="assets">
+        <exec command="php app/console assets:install --symlink" dir="${basedir}" passthru="${passthru}" />
+        <exec command="php app/console assetic:dump --env=prod --no-debug" dir="${basedir}" passthru="${passthru}" />
+    </target>
+
+    <!-- load fixtures -->
+    <target name="fixtures">
+        <exec command="php app/console doctrine:fixtures:load --no-interaction --env=test" dir="${basedir}" passthru="${passthru}" />
+    </target>
+
+    <target name="entity-update">
+        <propertyprompt propertyName="entity" promptText="Choose entity" />
+        <exec command="php app/console doctrine:generate:entities ${entity} --no-backup -v" dir="${basedir}" passthru="${passthru}" />
+    </target>
+
+    <!-- create db -->
+    <target name="db-create">
+        <exec command="php app/console doctrine:database:create" dir="${basedir}" passthru="${passthru}" />
+    </target>
+
+    <!-- update db -->
+    <target name="db-update">
+        <exec command="php app/console doctrine:schema:update --force" dir="${basedir}" passthru="${passthru}" />
+    </target>
+
+    <!-- drop db -->
+    <target name="db-drop">
+        <exec command="php app/console doctrine:schema:drop --force" dir="${basedir}" passthru="${passthru}" />
+    </target>
+
+</project>
