@@ -47,39 +47,47 @@
 
     <!-- clear cache web -->
     <target name="cache-clear">
-        <exec command="php app/console cache:clear --env=dev" dir="${basedir}" passthru="${passthru}" />
-        <exec command="php app/console cache:clear --env=prod" dir="${basedir}" passthru="${passthru}" />
-        <exec command="php app/console cache:clear --env=test" dir="${basedir}" passthru="${passthru}" />
+        <exec command="php bin/console cache:clear --env=dev" dir="${basedir}" passthru="${passthru}" />
+        <exec command="php bin/console cache:clear --env=prod" dir="${basedir}" passthru="${passthru}" />
+        <exec command="php bin/console cache:clear --env=test" dir="${basedir}" passthru="${passthru}" />
     </target>
     <!-- install assets -->
     <target name="assets">
-        <exec command="php app/console assets:install --symlink" dir="${basedir}" passthru="${passthru}" />
-        <exec command="php app/console assetic:dump --env=prod --no-debug" dir="${basedir}" passthru="${passthru}" />
+        <exec command="php bin/console assets:install --symlink" dir="${basedir}" passthru="${passthru}" />
+        <exec command="php bin/console assetic:dump --env=prod --no-debug" dir="${basedir}" passthru="${passthru}" />
     </target>
 
     <!-- load fixtures -->
     <target name="fixtures">
-        <exec command="php app/console doctrine:fixtures:load --no-interaction --env=test" dir="${basedir}" passthru="${passthru}" />
+        <exec command="php bin/console doctrine:fixtures:load --no-interaction --env=test" dir="${basedir}" passthru="${passthru}" />
     </target>
+
+    <!-- test -->
+    <target name="test">
+        <exec command="php bin/console cache:clear --env=test" dir="${basedir}" passthru="${passthru}" />
+        <exec command="bin/phpunit" dir="${basedir}" passthru="${passthru}" />
+    </target>
+
+
 
     <target name="entity-update">
         <propertyprompt propertyName="entity" promptText="Choose entity" />
-        <exec command="php app/console doctrine:generate:entities ${entity} --no-backup -v" dir="${basedir}" passthru="${passthru}" />
+        <exec command="php bin/console doctrine:generate:entities ${entity} --no-backup -v" dir="${basedir}" passthru="${passthru}" />
     </target>
 
     <!-- create db -->
     <target name="db-create">
-        <exec command="php app/console doctrine:database:create" dir="${basedir}" passthru="${passthru}" />
+        <exec command="php bin/console doctrine:database:create" dir="${basedir}" passthru="${passthru}" />
     </target>
 
     <!-- update db -->
     <target name="db-update">
-        <exec command="php app/console doctrine:schema:update --force" dir="${basedir}" passthru="${passthru}" />
+        <exec command="php bin/console doctrine:schema:update --force" dir="${basedir}" passthru="${passthru}" />
     </target>
 
     <!-- drop db -->
     <target name="db-drop">
-        <exec command="php app/console doctrine:schema:drop --force" dir="${basedir}" passthru="${passthru}" />
+        <exec command="php bin/console doctrine:schema:drop --force" dir="${basedir}" passthru="${passthru}" />
     </target>
 
 </project>

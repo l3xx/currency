@@ -60,15 +60,37 @@ class YahooFinanceDownloader extends BaseExchange implements ExchangeRateProvide
         {
             throw new \Exception('JSON parse error '.$error);
         }
+        //TODO лучше преобраззовать в объект, будет быстрее и проще
         if (!empty($resultResponse['query']['results']))
         {
-            foreach ($resultResponse['query']['results']['rate'] as $rate)
+            $oneElement=$resultResponse['query']['results']['rate'];
+            if (!empty($oneElement['id']))
             {
-                $currencyName=substr($rate['id'],0,3);// название валюты
-                $currencyValue=floatval($rate['Rate']);// значение валюты
-                $result[$currencyName]=$currencyValue;
+                $currencyMod=$this->modifyData($oneElement['id'],$oneElement['Rate']);
+                $result[key($currencyMod)]=current($currencyMod);
+            }
+            else
+            {
+                foreach ($oneElement as $rate)
+                {
+                    $currencyMod=$this->modifyData($rate['id'],$rate['Rate']);
+                    $result[key($currencyMod)]=current($currencyMod);
+                }
             }
         }
         return $result;
     }
+
+    /**
+     * Модификация перед отправкой в метод getRateValues
+     *
+     * @param $name
+     * @param $currency
+     * @return array
+     */
+    private function modifyData($name, $currency)
+    {
+        return [substr($name, 0, 3) => floatval($currency)];
+    }
+
 }

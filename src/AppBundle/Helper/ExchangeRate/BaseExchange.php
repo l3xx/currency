@@ -49,7 +49,7 @@ class BaseExchange
         $dataCurrenciesModify=array();
         foreach ($dataCurrencies as $currency)
         {
-            $currency=trim($currency);
+            $currency=mb_strtoupper(trim($currency));
             if ($this->validateAmountCurrency($currency))
             {
                 $dataCurrenciesModify[]=$currency;

@@ -8,6 +8,7 @@
 
 namespace AppBundle\Command;
 
+use AppBundle\Entity\Currency;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -27,12 +28,6 @@ class UpdateDatabaseExchangeCommand extends ContainerAwareCommand
                 InputArgument::REQUIRED,
                 'Name service for update'
             )
-//            ->addOption(
-//                'yell',
-//                null,
-//                InputOption::VALUE_NONE,
-//                'If set, the task will yell in uppercase letters'
-//            )
         ;
     }
 
@@ -43,13 +38,23 @@ class UpdateDatabaseExchangeCommand extends ContainerAwareCommand
         {
             throw new \Exception('Provider not found');
         }
-
         $provider=$this->getContainer()->get('app.helper_exchange_rate.'.$name);
         $values=$provider->getRateValues();
-
-
-
-
-
+        $manager=$this->getContainer()->get('doctrine')->getManager();
+        if (!empty($values['rates']))
+        {
+            foreach($values['rates'] as $nameCurrency=>$currencyResponse)
+            {
+                $currency= new Currency();
+                $currency->setProvider($name);
+                $currency->setName($nameCurrency);
+                $currency->setValue($currencyResponse);
+                $currency->setDate(new \DateTime($values['date']));
+                $output->writeln("<info>Currency: ".$nameCurrency.", value: ".$currencyResponse." added<info>");
+                $manager->persist($currency);
+            }
+            $manager->flush();
+        }
+        $output->writeln("<info>Completed<info>");
     }
 }
