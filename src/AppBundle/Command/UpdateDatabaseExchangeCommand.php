@@ -28,18 +28,25 @@ class UpdateDatabaseExchangeCommand extends ContainerAwareCommand
                 InputArgument::REQUIRED,
                 'Name service for update'
             )
+            ->addArgument(
+                'currencies',
+                InputArgument::OPTIONAL,
+                'Name service for update',
+                'USD,EUR'
+            )
         ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $name = $input->getArgument('name');
+        $currencies = $input->getArgument('currencies');
         if (!$this->getContainer()->has('app.helper_exchange_rate.'.$name))
         {
             throw new \Exception('Provider not found');
         }
         $provider=$this->getContainer()->get('app.helper_exchange_rate.'.$name);
-        $values=$provider->getRateValues();
+        $values=$provider->getRateValues($currencies);
         $manager=$this->getContainer()->get('doctrine')->getManager();
         if (!empty($values['rates']))
         {

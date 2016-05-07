@@ -7,7 +7,7 @@
     <target name="build" depends="cache-clear, assets" />
 
     <!-- Install targets -->
-    <target name="install" depends="composer-install, composer, cache-clear, assets" />
+    <target name="install" depends="composer-install, composer, cache-clear, assets, db-update" />
 
     <!-- install composer -->
     <target name="composer-install">
@@ -65,10 +65,9 @@
     <!-- test -->
     <target name="test">
         <exec command="php bin/console cache:clear --env=test" dir="${basedir}" passthru="${passthru}" />
+        <exec command="php doctrine:fixtures:load --no-interaction --env=test" dir="${basedir}" passthru="${passthru}" />
         <exec command="bin/phpunit" dir="${basedir}" passthru="${passthru}" />
     </target>
-
-
 
     <target name="entity-update">
         <propertyprompt propertyName="entity" promptText="Choose entity" />

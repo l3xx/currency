@@ -10,4 +10,24 @@ namespace AppBundle\Repository;
  */
 class CurrencyRepository extends \Doctrine\ORM\EntityRepository
 {
+    /**
+     * Возвращает одну запись из базы по параметрам
+     *
+     * @param string $source
+     * @param string $name
+     * @param \DateTime $date
+     * @return mixed
+     */
+    public function getOneRowForAjax($source, $name, \DateTime $date)
+    {
+        $q=$this->createQueryBuilder('currency');
+        $q->select('currency');
+        $q->andWhere('currency.date <= :date');
+        $q->andWhere('currency.name = :name');
+        $q->andWhere('currency.provider = :source');
+        $q->setMaxResults(1);
+        $q->addOrderBy('currency.date','DESC');
+        $q->setParameters(array('source'=>$source,'name'=>strtoupper($name),'date'=>$date));
+        return $q->getQuery()->getOneOrNullResult();
+    }
 }

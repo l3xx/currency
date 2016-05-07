@@ -7,7 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * Currency
  *
- * @ORM\Table(name="currency")
+ * @ORM\Table(name="currency",indexes={@ORM\Index(name="search_idx", columns={"name","provider","date"})})
  * @ORM\Entity(repositoryClass="AppBundle\Repository\CurrencyRepository")
  */
 class Currency

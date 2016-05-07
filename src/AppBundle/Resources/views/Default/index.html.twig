@@ -1,0 +1,24 @@
+{% extends '@App/base.html.twig' %}
+
+{% block header %}
+    <div class="row">
+        <div class="col-lg-6 text-center">
+            <h1>USD Цб Рф</h1>
+            <h2 class="currency" data-source="cbr" data-name-currency="usd">0.000</h2>
+        </div>
+        <div class="col-lg-6 text-center">
+            <h1>EUR Цб Рф</h1>
+            <h2 class="currency" data-source="cbr" data-name-currency="eur">0.0000</h2>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-6 text-center">
+            <h1>USD Yahoo Finance</h1>
+            <h2 class="currency" data-source="yahoo_finance" data-name-currency="usd">0.000</h2>
+        </div>
+        <div class="col-lg-6 text-center">
+            <h1>EUR Yahoo Finance</h1>
+            <h2 class="currency" data-source="yahoo_finance" data-name-currency="eur">0.0000</h2>
+        </div>
+    </div>
+{% endblock %}
