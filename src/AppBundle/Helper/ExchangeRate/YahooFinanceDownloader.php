@@ -7,6 +7,7 @@
  * Time: 15:42
  */
 namespace AppBundle\Helper\ExchangeRate;
+
 use GuzzleHttp\Client;
 
 class YahooFinanceDownloader extends BaseExchange implements ExchangeRateProvider
@@ -24,19 +25,18 @@ class YahooFinanceDownloader extends BaseExchange implements ExchangeRateProvide
      */
     public function getRateValues($currencies = 'USD, EUR')
     {
-        $currenciesData=$this->validateInputData($currencies);
+        $currenciesData = $this->validateInputData($currencies);
 
-        $resultData=array('date'=>$this->date->format('Y-m-d H:i:s'),'rates'=>array());
-        $url=$this->container->getParameter('url_yahoo');
-        $baseCurrency=$this->container->getParameter('base_currency_yahoo');
-        $resultAry=array();
-        foreach ($currenciesData as $currency)
-        {
-            $currency.=$baseCurrency;
-            $resultAry[]=$currency;
+        $resultData = array('date' => $this->date->format('Y-m-d H:i:s'), 'rates' => array());
+        $url = $this->container->getParameter('url_yahoo');
+        $baseCurrency = $this->container->getParameter('base_currency_yahoo');
+        $resultAry = array();
+        foreach ($currenciesData as $currency) {
+            $currency .= $baseCurrency;
+            $resultAry[] = $currency;
         }
-        $url=str_replace('USDRUB',implode(',',$resultAry),$url);
-        $resultData['rates']=$this->getDataFromResource($url);
+        $url = str_replace('USDRUB', implode(',', $resultAry), $url);
+        $resultData['rates'] = $this->getDataFromResource($url);
         return $resultData;
     }
 
@@ -48,33 +48,26 @@ class YahooFinanceDownloader extends BaseExchange implements ExchangeRateProvide
      */
     protected function getDataFromResource($url)
     {
-        $result=array();
+        $result = array();
         $client = new Client();
         $response = $client->request('GET', $url);
-        if ($response->getStatusCode()!=200  && $response->getHeader('Content-Type')=='text/json')
-        {
+        if ($response->getStatusCode() != 200 && $response->getHeader('Content-Type') == 'text/json') {
             throw new \Exception('Server not available or data not valid');
         }
-        $resultResponse=json_decode($response->getBody()->getContents(),true);
-        if ($error=json_last_error())
-        {
-            throw new \Exception('JSON parse error '.$error);
+        $resultResponse = json_decode($response->getBody()->getContents(), true);
+        if ($error = json_last_error()) {
+            throw new \Exception('JSON parse error ' . $error);
         }
         //TODO лучше преобраззовать в объект, будет быстрее и проще
-        if (!empty($resultResponse['query']['results']))
-        {
-            $oneElement=$resultResponse['query']['results']['rate'];
-            if (!empty($oneElement['id']))
-            {
-                $currencyMod=$this->modifyData($oneElement['id'],$oneElement['Rate']);
-                $result[key($currencyMod)]=current($currencyMod);
-            }
-            else
-            {
-                foreach ($oneElement as $rate)
-                {
-                    $currencyMod=$this->modifyData($rate['id'],$rate['Rate']);
-                    $result[key($currencyMod)]=current($currencyMod);
+        if (!empty($resultResponse['query']['results'])) {
+            $oneElement = $resultResponse['query']['results']['rate'];
+            if (!empty($oneElement['id'])) {
+                $currencyMod = $this->modifyData($oneElement['id'], $oneElement['Rate']);
+                $result[key($currencyMod)] = current($currencyMod);
+            } else {
+                foreach ($oneElement as $rate) {
+                    $currencyMod = $this->modifyData($rate['id'], $rate['Rate']);
+                    $result[key($currencyMod)] = current($currencyMod);
                 }
             }
         }

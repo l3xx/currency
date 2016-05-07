@@ -1,5 +1,6 @@
 <?php
 namespace AppBundle\Helper\ExchangeRate;
+
 use DateTime;
 use Exception;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -18,7 +19,7 @@ class BaseExchange
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
-        $this->date=new DateTime();
+        $this->date = new DateTime();
     }
 
     /**
@@ -30,33 +31,26 @@ class BaseExchange
      */
     protected function validateInputData($currencies)
     {
-        if (empty($currencies))
-        {
+        if (empty($currencies)) {
             throw new Exception('Currencies is empty');
         }
 
-        $dataCurrencies=$currencies;
-        if (!is_array($currencies))
-        {
-            $dataCurrencies=explode(',',$currencies);
+        $dataCurrencies = $currencies;
+        if (!is_array($currencies)) {
+            $dataCurrencies = explode(',', $currencies);
         }
 
-        if (empty($dataCurrencies))
-        {
+        if (empty($dataCurrencies)) {
             throw new Exception('Currencies is not valid');
         }
 
-        $dataCurrenciesModify=array();
-        foreach ($dataCurrencies as $currency)
-        {
-            $currency=mb_strtoupper(trim($currency));
-            if ($this->validateAmountCurrency($currency))
-            {
-                $dataCurrenciesModify[]=$currency;
-            }
-            else
-            {
-                throw new Exception(printf('Currency "%s" is not valid',$currency));
+        $dataCurrenciesModify = array();
+        foreach ($dataCurrencies as $currency) {
+            $currency = mb_strtoupper(trim($currency));
+            if ($this->validateAmountCurrency($currency)) {
+                $dataCurrenciesModify[] = $currency;
+            } else {
+                throw new Exception(printf('Currency "%s" is not valid', $currency));
             }
         }
         return $dataCurrenciesModify;
@@ -71,15 +65,13 @@ class BaseExchange
      */
     protected function validateAmountCurrency($currency)
     {
-        $res=false;
-        $result=preg_match('/^[A-Z]{3}/',$currency,$matches);
-        if ($result)
-        {
-            $res=true;
+        $res = false;
+        $result = preg_match('/^[A-Z]{3}/', $currency, $matches);
+        if ($result) {
+            $res = true;
         }
         return $res;
     }
-
 
 
 }

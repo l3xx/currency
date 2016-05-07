@@ -7,6 +7,7 @@
  * Time: 15:41
  */
 namespace AppBundle\Helper\ExchangeRate;
+
 use DateTime;
 use DOMElement;
 use GuzzleHttp\Client;
@@ -28,18 +29,16 @@ class CbrDownloader extends BaseExchange implements ExchangeRateProvider
     public function getRateValues($currencies = 'USD, EUR')
     {
 
-        $currenciesData=$this->validateInputData($currencies);
+        $currenciesData = $this->validateInputData($currencies);
 
-        $resultData=array('date'=>$this->date->format('Y-m-d H:i:s'),'rates'=>array());
-        $url=$this->container->getParameter('url_cbr');
-        $result=$this->getDataFromResource($url,$this->date);
-        foreach ($currenciesData as $currency)
-        {
+        $resultData = array('date' => $this->date->format('Y-m-d H:i:s'), 'rates' => array());
+        $url = $this->container->getParameter('url_cbr');
+        $result = $this->getDataFromResource($url, $this->date);
+        foreach ($currenciesData as $currency) {
             // TODO либо сделать проверку и что нибудь писать в случает отсутсвия такой валюты на сервере
-            $resultData['rates'][$currency]='N/A';
-            if (!empty($result[$currency]))
-            {
-                $resultData['rates'][$currency]=$result[$currency];
+            $resultData['rates'][$currency] = 'N/A';
+            if (!empty($result[$currency])) {
+                $resultData['rates'][$currency] = $result[$currency];
             }
         }
         return $resultData;
@@ -54,25 +53,23 @@ class CbrDownloader extends BaseExchange implements ExchangeRateProvider
      */
     protected function getDataFromResource($url, DateTime $date)
     {
-        $result=array();
+        $result = array();
         $client = new Client();
         $response = $client->request('GET', $url, [
             'form_params' => [
-                'date_req'=>$date->format('d/m/Y')
-                ]
-            ]);
-        if ($response->getStatusCode()!=200  && $response->getHeader('Content-Type')=='text/xml')
-        {
+                'date_req' => $date->format('d/m/Y')
+            ]
+        ]);
+        if ($response->getStatusCode() != 200 && $response->getHeader('Content-Type') == 'text/xml') {
             throw new \Exception('Server not available or data not valid');
         }
         $crawler = new Crawler($response->getBody()->getContents());
-        $nodeValute=$crawler->filter('ValCurs>Valute');
+        $nodeValute = $crawler->filter('ValCurs>Valute');
         /** @var DOMElement $valute */
-        foreach ($nodeValute as $valute)
-        {
-            $currencyName=$valute->childNodes[3]->nodeValue;// название валюты
-            $currencyValue=floatval(str_replace(",",".",$valute->childNodes[9]->nodeValue));// значение валюты
-            $result[$currencyName]=$currencyValue;
+        foreach ($nodeValute as $valute) {
+            $currencyName = $valute->childNodes[3]->nodeValue;// название валюты
+            $currencyValue = floatval(str_replace(",", ".", $valute->childNodes[9]->nodeValue));// значение валюты
+            $result[$currencyName] = $currencyValue;
         }
 
         return $result;
